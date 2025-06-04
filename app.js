@@ -43,6 +43,49 @@ function determineWinner(choice1, choice2) {
    return winConditions[choice1] === choice2 ? "win" : "lose";
 }
 
+app.post("/api/ai-recommendation", async (req, res) => {
+   try {
+      console.log("🤖 AI recommendation request received:", req.body);
+
+      const { gameHistory, currentRound, playerName, opponentName } = req.body;
+
+      if (!gameHistory || !currentRound || !playerName || !opponentName) {
+         return res.status(400).json({
+            error: "Missing required parameters",
+            required: [
+               "gameHistory",
+               "currentRound",
+               "playerName",
+               "opponentName",
+            ],
+         });
+      }
+
+      const recommendation = await generateRPSRecommendation(
+         gameHistory,
+         currentRound,
+         playerName,
+         opponentName
+      );
+
+      console.log("✅ AI recommendation generated:", recommendation);
+      res.json({ recommendation });
+   } catch (error) {
+      console.error("❌ Error in AI recommendation endpoint:", error.message);
+      console.error("Stack trace:", error.stack);
+
+      // Return a fallback recommendation instead of just error
+      const fallbackChoices = ["rock", "paper", "scissors"];
+      const fallbackRecommendation =
+         fallbackChoices[Math.floor(Math.random() * fallbackChoices.length)];
+
+      res.json({
+         recommendation: fallbackRecommendation,
+         error: "AI temporarily unavailable, using fallback recommendation",
+         fallback: true,
+      });
+   }
+});
 io.on("connection", (socket) => {
    console.log("User connected:", socket.id);
 
