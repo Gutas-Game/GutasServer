@@ -1,0 +1,5 @@
+# Gemini AI Configuration
+GEMINI_API_KEY=your.env.GEMINI_API_KEY
+
+# Server Configuration
+PORT=your.env.PORT
